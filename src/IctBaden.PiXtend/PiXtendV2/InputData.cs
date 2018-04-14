@@ -3,11 +3,13 @@
 
 using System.Runtime.InteropServices;
 
-namespace IctBaden.PiXtend
+namespace IctBaden.PiXtend.PiXtendV2
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct InV2S
+    public class InputData
     {
+        private const int SizeRetainDataIn = 32;
+
         public byte byFirmware;
         public byte byHardware;
         public byte byModelIn;
@@ -39,7 +41,12 @@ namespace IctBaden.PiXtend
         public float rHumid1;
         public float rHumid2;
         public float rHumid3;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = SizeRetainDataIn)]
         public byte[] abyRetainDataIn;
-    }
+
+        public InputData()
+        {
+            abyRetainDataIn = new byte[SizeRetainDataIn];
+        }
+}
 }

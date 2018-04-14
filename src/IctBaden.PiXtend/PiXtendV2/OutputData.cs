@@ -3,11 +3,13 @@
 
 using System.Runtime.InteropServices;
 
-namespace IctBaden.PiXtend
+namespace IctBaden.PiXtend.PiXtendV2
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct OutV2S
+    public class OutputData
     {
+        private const int SizeRetainDataOut = 32;
+
         public byte byModelOut;
         public byte byUCMode;
         public byte byUCCtrl0;
@@ -35,7 +37,13 @@ namespace IctBaden.PiXtend
         public byte byGPIO1Dht11;
         public byte byGPIO2Dht11;
         public byte byGPIO3Dht11;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = SizeRetainDataOut)]
         public byte[] abyRetainDataOut;
+
+        public OutputData()
+        {
+        byModelOut = SPI.ModelIdV2;
+            abyRetainDataOut = new byte[SizeRetainDataOut];
+        }
     }
 }
