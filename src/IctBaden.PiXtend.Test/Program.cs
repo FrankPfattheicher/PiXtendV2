@@ -1,42 +1,68 @@
 ﻿using System;
+using System.Threading.Tasks;
 using IctBaden.PiXtend.PiXtendV2;
 
 namespace IctBaden.PiXtend.Test
 {
     internal class Program
     {
+        private static bool _running = true;
+        private static readonly InputData Inputs = new InputData();
+        private static readonly OutputData Outputs = new OutputData();
+
         private static void Main()
         {
             Console.WriteLine("PiXtend.Test");
 
-            SPI.SpiControllerReset();
-            Console.WriteLine("SpiControllerReset ok");
+            PiXtendSPI.UcReset();
+            Console.WriteLine("UcReset ok");
 
             //Setup SPI using wiringPi	
-            SPI.SpiSetup(0); //use SPI device 0.0 (PiXtend V2 -S-)
-            Console.WriteLine("SpiSetup(0) ok");
-            SPI.SpiSetup(1); //use SPI device 0.1 (PiXtend V2 -S- DAC)
-            Console.WriteLine("SpiSetup(1) ok");
+            PiXtendSPI.Setup(0); //use SPI device 0.0 (PiXtend V2 -S-)
+            PiXtendSPI.Setup(1); //use SPI device 0.1 (PiXtend V2 -S- DAC)
+            PiXtendSPI.SetGpioControl(0);
+            PiXtendSPI.AutoMode(Outputs, Inputs);
 
+            var poll = Task.Run((Action) Poll);
 
-
-            var inputs = new InputData();
-            var outputs = new OutputData();
-            SPI.SpiAutoMode(outputs, inputs);
-
-            while (true)
+            while (_running)
             {
                 var key = Console.ReadKey();
                 if (key.KeyChar == 'x') break;
 
                 var mask = (byte)(1 << (key.KeyChar - '0'));
-                outputs.byRelayOut ^= mask;
+                Outputs.byRelayOut ^= mask;
 
-                SPI.SpiAutoMode(outputs, inputs);
-                Console.WriteLine($"Inputs = {inputs.byDigitalIn:X}");
+                Console.WriteLine($"\r\nOutputs = {Outputs.byDigitalOut:X}");
             }
 
+            _running = false;
+            poll.Wait();
             Console.WriteLine("done.");
+        }
+
+        private static void Poll()
+        {
+            var oldInputs = PiXtendSPI.GetDin();
+            var oldGpio = PiXtendSPI.GetGpio();
+
+            while (_running)
+            {
+                Task.Delay(50).Wait();
+                PiXtendSPI.AutoMode(Outputs, Inputs);
+
+                if (Inputs.byGPIOIn != oldGpio)
+                {
+                    oldGpio = Inputs.byGPIOIn;
+                    Console.WriteLine($"GPIO = {Inputs.byGPIOIn:X}");
+                }
+
+                if (Inputs.byDigitalIn != oldInputs)
+                {
+                    oldInputs = Inputs.byDigitalIn;
+                    Console.WriteLine($"Inputs= {Inputs.byDigitalIn:X}");
+                }
+            }
         }
     }
 }

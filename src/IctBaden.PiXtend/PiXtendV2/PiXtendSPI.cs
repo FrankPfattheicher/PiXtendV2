@@ -4,15 +4,14 @@ namespace IctBaden.PiXtend.PiXtendV2
 {
 
     // ReSharper disable once InconsistentNaming
-    public static class SPI
+    public static class PiXtendSPI
     {
         public const byte ModelIdV2 = 83;
 
         private static ushort Crc16Calc(ushort crc, byte data)
         {
-            int i;
             crc ^= data;
-            for (i = 0; i < 8; ++i)
+            for (var i = 0; i < 8; ++i)
             {
                 if ((crc & 1) != 0)
                 {
@@ -27,15 +26,15 @@ namespace IctBaden.PiXtend.PiXtendV2
         }
 
         // ReSharper disable once InconsistentNaming
-        public static int SpiAutoModeDAC(OutputDataDAC outputDataDac)
+        public static int AutoModeDAC(OutputDataDAC outputDataDac)
         {
-            SpiSetAout(0, outputDataDac.AnaOut0);
-            SpiSetAout(1, outputDataDac.AnaOut1);
+            SetAout(0, outputDataDac.AnaOut0);
+            SetAout(1, outputDataDac.AnaOut1);
             return 0;
         }
 
 
-    public static int SpiAutoMode(OutputData outputData, InputData inputData)
+        public static int AutoMode(OutputData outputData, InputData inputData)
         {
             ushort wTempValue;
             int i;
@@ -108,7 +107,7 @@ namespace IctBaden.PiXtend.PiXtendV2
 
             //-------------------------------------------------------------------------
             //Initialise SPI Data Transfer with OutputData
-            WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
             //-------------------------------------------------------------------------
 
             //Calculate Header CRC16 Receive Checksum
@@ -321,7 +320,7 @@ namespace IctBaden.PiXtend.PiXtendV2
         }
 
 
-        public static int SpiSetDout(byte value)
+        public static int SetDout(byte value)
         {
             const int spiOutputLength = 4;
             var spiOutput = new byte[spiOutputLength];
@@ -332,10 +331,10 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[2] = value;
             spiOutput[3] = 0b10101010;
 
-            return WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            return SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
         }
 
-        public static byte SpiGetDout()
+        public static byte GetDout()
         {
             const int spiOutputLength = 4;
             var spiOutput = new byte [spiOutputLength];
@@ -346,13 +345,13 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[2] = 0b10101010; // readback command
             spiOutput[3] = 0b10101010; // read value
 
-            WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
             Timing.Delay(10);
 
             return spiOutput[3];
         }
 
-        public static byte SpiGetDin()
+        public static byte GetDin()
         {
             const int spiOutputLength = 4;
             var spiOutput = new byte[spiOutputLength];
@@ -363,13 +362,13 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[2] = 0b10101010; // readback command
             spiOutput[3] = 0b10101010; // read value
 
-            WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
             Timing.Delay(10);
 
             return spiOutput[3];
         }
 
-        public static ushort SpiGetAin(int index)
+        public static ushort GetAin(int index)
         {
             const int spiOutputLength = 5;
             var spiOutput = new byte[spiOutputLength];
@@ -398,7 +397,7 @@ namespace IctBaden.PiXtend.PiXtendV2
                 spiOutput[3] = 0b00000000; // read value low
                 spiOutput[4] = 0b00000000; // read value high
 
-                WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+                SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
                 Timing.Delay(100);
             }
 
@@ -410,7 +409,7 @@ namespace IctBaden.PiXtend.PiXtendV2
             return output;
         }
 
-        public static int SpiSetAout(int channel, ushort value)
+        public static int SetAout(int channel, ushort value)
         {
             const int spiOutputLength = 2;
             var spiOutput = new byte[spiOutputLength];
@@ -435,10 +434,10 @@ namespace IctBaden.PiXtend.PiXtendV2
             tmp = (ushort) (tmp << 2);
             spiOutput[1] = (byte) tmp;
 
-            return WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            return SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
         }
 
-        public static int SpiSetRelays(byte values)
+        public static int SetRelays(byte values)
         {
             const int spiOutputLength = 4;
             var spiOutput = new byte[spiOutputLength];
@@ -449,10 +448,10 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[2] = values;
             spiOutput[3] = 0b10101010;
 
-            return WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            return SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
         }
 
-        public static byte SpiGetRelays()
+        public static byte GetRelays()
         {
             const int spiOutputLength = 4;
             var spiOutput = new byte[spiOutputLength];
@@ -463,13 +462,13 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[2] = 0b10101010; // readback command
             spiOutput[3] = 0b10101010; // read value
 
-            WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
             Timing.Delay(10);
 
             return spiOutput[3];
         }
 
-        public static ushort SpiGetTemp(int index)
+        public static ushort GetTemp(int index)
         {
             const int spiOutputLength = 5;
             var spiOutput = new byte[spiOutputLength];
@@ -498,7 +497,7 @@ namespace IctBaden.PiXtend.PiXtendV2
                 spiOutput[3] = 0b00000000; // read value low
                 spiOutput[4] = 0b00000000; // read value high
 
-                WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+                SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
                 Timing.Delay(100);
             }
 
@@ -509,7 +508,7 @@ namespace IctBaden.PiXtend.PiXtendV2
             return output;
         }
 
-        public static ushort SpiGetHum(int index)
+        public static ushort GetHumidity(int index)
         {
             const int spiOutputLength = 5;
             var spiOutput = new byte[spiOutputLength];
@@ -538,7 +537,7 @@ namespace IctBaden.PiXtend.PiXtendV2
                 spiOutput[3] = 0b00000000; // read value low
                 spiOutput[4] = 0b00000000; // read value high
 
-                WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+                SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
                 Timing.Delay(100);
             }
 
@@ -549,7 +548,7 @@ namespace IctBaden.PiXtend.PiXtendV2
             return output;
         }
 
-        public static int SpiSetServo(int channel, byte value)
+        public static int SetServo(int channel, byte value)
         {
             const int spiOutputLength = 4;
             var spiOutput = new byte[spiOutputLength];
@@ -568,10 +567,10 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[2] = value;
             spiOutput[3] = 0b10101010;
 
-            return WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            return SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
         }
 
-        public static int SpiSetPwm(int channel, ushort value)
+        public static int SetPwm(int channel, ushort value)
         {
             const int spiOutputLength = 5;
             var spiOutput = new byte[spiOutputLength];
@@ -591,7 +590,7 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[3] = (byte) ((value & 0b1111111100000000) >> 8);
             spiOutput[4] = 0b10101010;
 
-            return WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            return SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
         }
 
         public static int SpiSetPwmControl(byte value0, byte value1, byte value2)
@@ -607,10 +606,10 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[4] = value2;
             spiOutput[5] = 0b10101010;
 
-            return WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            return SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
         }
 
-        public static int SpiSetGpioControl(byte value)
+        public static int SetGpioControl(byte value)
         {
             const int spiOutputLength = 4;
             var spiOutput = new byte[spiOutputLength];
@@ -621,12 +620,12 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[2] = value;
             spiOutput[3] = 0b10101010;
 
-            WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
 
             return 0;
         }
 
-        public static int SpiSetUcControl(byte value)
+        public static int SetUcControl(byte value)
         {
             const int spiOutputLength = 4;
             var spiOutput = new byte[spiOutputLength];
@@ -637,10 +636,10 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[2] = value;
             spiOutput[3] = 0b10101010;
 
-            return WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            return SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
         }
 
-        public static int SpiSetAiControl(byte value0, byte value1)
+        public static int SetAiControl(byte value0, byte value1)
         {
             const int spiOutputLength = 5;
             var spiOutput = new byte[spiOutputLength];
@@ -652,12 +651,12 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[3] = value1;
             spiOutput[4] = 0b10101010;
 
-            WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
 
             return 0;
         }
 
-        public static int SpiSetRaspStat(byte value)
+        public static int SetRaspStat(byte value)
         {
             const int spiOutputLength = 4;
             var spiOutput = new byte[spiOutputLength];
@@ -668,7 +667,7 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[2] = value;
             spiOutput[3] = 0b10101010;
 
-            return WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            return SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
         }
 
         /// <summary>
@@ -676,18 +675,18 @@ namespace IctBaden.PiXtend.PiXtendV2
         /// </summary>
         /// <param name="spiDevice"></param>
         /// <returns></returns>
-        public static int SpiSetup(int spiDevice)
+        public static int Setup(int spiDevice)
         {
             const int pinSpiEnable = 5;
             const int spiFrequency = 700000;
 
             GPIO.PinMode(pinSpiEnable, (int)GPIOpinmode.Output);
             GPIO.DigitalWrite(pinSpiEnable, 1);
-            WiringPi.SPI.WiringPiSPISetup(spiDevice, spiFrequency);
+            SPI.WiringPiSPISetup(spiDevice, spiFrequency);
             return 0;
         }
 
-        public static int SpiControllerReset()
+        public static int UcReset()
         {
             const int pinReset = 4;
 
@@ -700,7 +699,7 @@ namespace IctBaden.PiXtend.PiXtendV2
             return 0;
         }
 
-        public static int SpiGetControllerStatus()
+        public static int GetUcStatus()
         {
             const int spiOutputLength = 4;
             var spiOutput = new byte[spiOutputLength];
@@ -711,13 +710,13 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[2] = 0b10101010; // readback command
             spiOutput[3] = 0b00000000; // read value
 
-            WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
             Timing.Delay(10);
 
             return spiOutput[3];
         }
 
-        public static ushort SpiGetControllerVersion()
+        public static ushort GetUcVersion()
         {
             const int spiOutputLength = 5;
             var spiOutput = new byte[spiOutputLength];
@@ -729,7 +728,7 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[3] = 0b00000000; // read value low
             spiOutput[4] = 0b00000000; // read value high
 
-            WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
             Timing.Delay(100);
 
             var high = (ushort)(spiOutput[4] << 8);
@@ -739,25 +738,7 @@ namespace IctBaden.PiXtend.PiXtendV2
             return version;
         }
 
-        public static int ChangeGpioMode(char pin, GPIOpinmode mode)
-        {
-            Init.WiringPiSetup();
-            GPIO.PinMode(pin, (int)mode);
-            return 0;
-        }
-
-        public static int ChangeSerialMode(int mode)
-        {
-            const int pinSerial = 1; //Pin 1 ^= GPIO18
-
-            Init.WiringPiSetup();
-            GPIO.PinMode(pinSerial, (int)GPIOpinmode.Output);
-
-            GPIO.DigitalWrite(pinSerial, mode == 1 ? 1 : 0);
-            return 0;
-        }
-
-        public static int SpiSetGpio(byte values)
+        public static int SetGpio(byte values)
         {
             const int spiOutputLength = 4;
             var spiOutput = new byte[spiOutputLength];
@@ -768,12 +749,12 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[2] = values;
             spiOutput[3] = 0b10101010;
 
-            WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
 
             return 0;
         }
 
-        public static byte SpiGetGpio()
+        public static byte GetGpio()
         {
             const int spiOutputLength = 4;
             var spiOutput = new byte[spiOutputLength];
@@ -784,7 +765,7 @@ namespace IctBaden.PiXtend.PiXtendV2
             spiOutput[2] = 0b10101010; // readback command
             spiOutput[3] = 0b10101010; // read value
 
-            WiringPi.SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
+            SPI.WiringPiSPIDataRW(spiDevice, spiOutput, spiOutputLength);
             Timing.Delay(10);
 
             return spiOutput[3];

@@ -42,7 +42,7 @@ namespace IctBaden.PiXtend.PiXtendV2
 
         public OutputData()
         {
-        byModelOut = SPI.ModelIdV2;
+        byModelOut = PiXtendSPI.ModelIdV2;
             abyRetainDataOut = new byte[SizeRetainDataOut];
         }
     }
