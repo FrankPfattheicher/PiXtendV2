@@ -18,7 +18,7 @@ $packageVersion = $Matches.semVer
 Write-Output "The current version is: $packageVersion"
 Write-Host "##vso[task.setvariable variable=PACKAGE_VERSION;]$packageVersion"
 
-$FileName = ".\IctBaden.PiXtend.Net40\AssemblyInfo.cs"
+$FileName = ".\IctBaden.PiXtend.Net40\Properties\AssemblyInfo.cs"
 (Get-Content $FileName) -replace $semVer,$packageVersion | Set-Content $FileName
 
 $FileName = ".\IctBaden.PiXtend\IctBaden.PiXtend.csproj"
